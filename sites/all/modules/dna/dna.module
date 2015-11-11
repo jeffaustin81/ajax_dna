@@ -1,27 +1,67 @@
 <?php
 
-function dna_menu() {
-  $items['dna'] = array(
+function dna_menu()
+{
+    $items['dna'] = array(
     'title' => 'DNA',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('dna_form'),
-    'access callback' => TRUE,
+    'access callback' => true,
     'type' => MENU_NORMAL_ITEM,
   );
-  $items['dna_success_page'] = array(
+    $items['dna_success_page'] = array(
     'title' => 'DNA Results',
     'page callback' => 'dna_success',
-    'access callback' => TRUE,
-    'type' => MENU_CALLBACK
+    'access callback' => true,
+    'type' => MENU_CALLBACK,
   );
-  return $items;
+
+    return $items;
 }
 
-function dna_form() {
-  $form['dna_input'] = array(
+function dna_form()
+{
+    $form['dna_input'] = array(
     '#title' => 'DNA Sequence',
     '#type' => 'textfield',
     '#description' => t('Please enter half of DNA sequence.'),
     '#element_validate' => array(),
-    '#required' => TRUE,
+    '#required' => true,
   );
+
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => 'Submit',
+  );
+
+    return $form;
+}
+
+function dna_form_submit($form, &$form_state)
+{
+    $dna_input = strtoupper($form_state['values']['dna_input']);
+    $values = array(
+        'A' => 'T',
+        'T' => 'A',
+        'G' => 'C',
+        'C' => 'G',
+    );
+
+    $output = "";
+
+    $dna_array = str_split($dna_input);
+    foreach ($dna_array as $char) {
+        $output .= $values[$char];
+        // $output .= $values[$char];
+    }
+
+    $_SESSION['result'] = $output;
+    $form_state['redirect'] = 'dna_success_page';
+}
+
+function dna_success()
+{
+    $result_display = $_SESSION['result'];
+    return $result_display;
+
+}
